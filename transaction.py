@@ -11,22 +11,46 @@ import json
 import hashlib
 import time
 
+#added
+import os
+
 '''
 first draft of the transaction will come back and refine later working on  the block file now
 '''
 
-timestamp = time.time()
+#added
+PENDING_DIR = "pending_transactions"
+
+def sha256_hash(content: str) -> str:
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+if not os.path.exists(PENDING_DIR):
+    os.makedirs(PENDING_DIR)
+
+timestamp = int(time.time())
 from_ = input("enter the account to transfer from: ")
 to = input("enter the account to transfer to: ")
 amount = input("enter the amount to transfer:")
 data = {
-    timestamp,
+    "timestamp": timestamp,
     "from": from_,
     "to": to,
-    "amount": amount
+    "amount": int(amount)
 }
+
+#added
+
+json_str = json.dumps(data, separators = (",", ":"))
+tx_hash = sha256_hash(json_str)
+
+"""
 hash = hashlib.sha256()
+
+
 filename = f"{hash}.json"
+"""
+
+filename = os.path.join(PENDING_DIR, f"{tx_hash}.json")
 
 with open(filename, "w") as file:
     json.dump(data, file, indent=4)
